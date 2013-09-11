@@ -19,19 +19,20 @@ import jp.sf.amateras.mirage.type.ValueType;
 
 public class MirageUtil {
 
-	public static ValueType<?> getValueType(
-			Class<?> propertyType, PropertyDesc propertyDesc, Dialect dialect, List<ValueType<?>> valueTypes){
+	@SuppressWarnings("unchecked")
+	public static<T> ValueType<T> getValueType(
+			Class<T> propertyType, PropertyDesc propertyDesc, Dialect dialect, List<ValueType<?>> valueTypes){
 
 		if(dialect.getValueType() != null){
 			ValueType<?> valueType = dialect.getValueType();
 			if(valueType.isSupport(propertyType, propertyDesc)){
-				return valueType;
+				return (ValueType<T>) valueType;
 			}
 		}
 
 		for(ValueType<?> valueType: valueTypes){
 			if(valueType.isSupport(propertyType, propertyDesc)){
-				return valueType;
+				return (ValueType<T>) valueType;
 			}
 		}
 

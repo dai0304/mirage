@@ -39,51 +39,20 @@ public class DefaultEntityOperator implements EntityOperator {
 	 * @return the instance of entity class or Map
 	 * @throws EntityCreationFailedException if {@link EntityOperator} failed to create a result entity
 	 */
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings("unchecked")
 	public <T> T createEntity(Class<T> entityType, ResultSet rs,
 			ResultSetMetaData meta, int columnCount, BeanDesc beanDesc,
 			Dialect dialect, List<ValueType<?>> valueTypes, NameConverter nameConverter) {
 
 		try {
 			{
-				ValueType valueType = MirageUtil.getValueType(entityType, null, dialect, valueTypes);
+				ValueType<T> valueType = MirageUtil.getValueType(entityType, null, dialect, valueTypes);
 				if(valueType != null){
-					return (T) ((ValueType<T>) valueType).get(entityType, rs, 1);
+					return valueType.get(entityType, rs, 1);
 				}
 			}
 
-			T entity = null;
-
-			if(entityType == Map.class){
-				entity = (T) new HashMap<String, Object>();
-			} else {
-				Constructor<T>[] constructors = (Constructor<T>[]) entityType.getDeclaredConstructors();
-				for(Constructor<T> constructor: constructors){
-					try {
-						constructor.setAccessible(true);
-						Class<?>[] types = constructor.getParameterTypes();
-						Object[] params = new Object[types.length];
-						for(int i = 0; i < params.length; i++){
-							ValueType valueType = MirageUtil.getValueType(types[i], null, dialect, valueTypes);
-							if(valueType != null){
-								params[i] = valueType.getDefaultValue();
-							}
-						}
-						entity = constructor.newInstance(params);
-					} catch (InstantiationException e) {
-						// ignore
-					} catch (IllegalAccessException e) {
-						// ignore
-					} catch (IllegalArgumentException e) {
-						// ignore
-					} catch (InvocationTargetException e) {
-						// ignore
-					}
-				}
-			}
-			if(entity == null) {
-				throw new EntityCreationFailedException();
-			}
+			T entity = instantiate(entityType, dialect, valueTypes);
 
 			for(int i = 0; i < columnCount; i++){
 				String columnLabel = meta.getColumnLabel(i + 1);
@@ -122,6 +91,7 @@ public class DefaultEntityOperator implements EntityOperator {
 
 				if(pd != null){
 					Class<?> propertyType = pd.getPropertyType();
+					@SuppressWarnings("rawtypes")
 					ValueType valueType = MirageUtil.getValueType(propertyType, pd, dialect, valueTypes);
 					if(valueType != null){
 						pd.setValue(entity, valueType.get(propertyType, rs, columnLabel));
@@ -153,6 +123,43 @@ public class DefaultEntityOperator implements EntityOperator {
 			throw new EntityCreationFailedException(e);
 
 		}
+	}
+
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	private <T>T instantiate(Class<T> entityType, Dialect dialect, List<ValueType<?>> valueTypes) {
+		T entity = null;
+
+		if(entityType == Map.class){
+			entity = (T) new HashMap<String, Object>();
+		} else {
+			Constructor<T>[] constructors = (Constructor<T>[]) entityType.getDeclaredConstructors();
+			for(Constructor<T> constructor: constructors){
+				try {
+					constructor.setAccessible(true);
+					Class<?>[] types = constructor.getParameterTypes();
+					Object[] params = new Object[types.length];
+					for(int i = 0; i < params.length; i++){
+						ValueType valueType = MirageUtil.getValueType(types[i], null, dialect, valueTypes);
+						if(valueType != null){
+							params[i] = valueType.getDefaultValue();
+						}
+					}
+					entity = constructor.newInstance(params);
+				} catch (InstantiationException e) {
+					// ignore
+				} catch (IllegalAccessException e) {
+					// ignore
+				} catch (IllegalArgumentException e) {
+					// ignore
+				} catch (InvocationTargetException e) {
+					// ignore
+				}
+			}
+		}
+		if(entity == null) {
+			throw new EntityCreationFailedException();
+		}
+		return entity;
 	}
 
 	public PrimaryKeyInfo getPrimaryKeyInfo(Class<?> clazz,
