@@ -2,6 +2,7 @@ package jp.sf.amateras.mirage;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.List;
 
 import jp.sf.amateras.mirage.annotation.Column;
@@ -31,8 +32,6 @@ public interface EntityOperator {
 	 * @param <T> the type parameter of entity class
 	 * @param clazz the entity class
 	 * @param rs the ResultSet
-	 * @param meta the ResultSetMetaData
-	 * @param columnCount the column count
 	 * @param beanDesc the BeanDesc of the entity class
 	 * @param dialect the Dialect
 	 * @param valueTypes the list of ValueTypes
@@ -40,9 +39,8 @@ public interface EntityOperator {
 	 * @return the instance of entity class or Map
 	 * @throws EntityCreationFailedException if {@link EntityOperator} failed to create a result entity
 	 */
-	public <T> T createEntity(Class<T> clazz, ResultSet rs,
-			ResultSetMetaData meta, int columnCount, BeanDesc beanDesc,
-			Dialect dialect, List<ValueType<?>> valueTypes, NameConverter nameConverter);
+	public <T> T createEntity(Class<T> clazz, ResultSet rs, BeanDesc beanDesc,
+			Dialect dialect, List<ValueType<?>> valueTypes, NameConverter nameConverter) throws SQLException;
 
 	/**
 	 * Retrieves the metadata of the primary key from the given PropertyDesc.

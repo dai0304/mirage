@@ -294,11 +294,9 @@ public class CallExecutor {
     }
 
     protected <T> T handleSingleResult(final Class<T> resultClass, final ResultSet rs) throws SQLException {
-    	ResultSetMetaData meta = rs.getMetaData();
     	BeanDesc beanDesc = BeanDescFactory.getBeanDesc(resultClass);
 
-    	return entityOperator.createEntity(resultClass, rs, meta, meta.getColumnCount(), beanDesc,
-    			dialect, valueTypes, nameConverter);
+    	return entityOperator.createEntity(resultClass, rs, beanDesc, dialect, valueTypes, nameConverter);
     }
 
     @SuppressWarnings("unchecked")
@@ -342,14 +340,10 @@ public class CallExecutor {
 
 		List<T> list = new ArrayList<T>();
 
-		ResultSetMetaData meta = rs.getMetaData();
-		int columnCount = meta.getColumnCount();
-
 		BeanDesc beanDesc = BeanDescFactory.getBeanDesc(elementClass);
 
 		while(rs.next()){
-			T entity = entityOperator.createEntity(elementClass, rs, meta, columnCount, beanDesc,
-					dialect, valueTypes, nameConverter);
+			T entity = entityOperator.createEntity(elementClass, rs, beanDesc, dialect, valueTypes, nameConverter);
 			list.add(entity);
 		}
 

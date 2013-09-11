@@ -46,14 +46,14 @@ public class DefaultEntityOperatorTest extends TestCase {
 	public void testDefaultEntityOperator() throws SQLException {
 		ResultSet rs = mock(ResultSet.class);
 		ResultSetMetaData meta = mock(ResultSetMetaData.class);
+		when(rs.getMetaData()).thenReturn(meta);
 		BeanDesc beanDesc = mock(BeanDesc.class);
 		Dialect dialect = mock(Dialect.class);
 		NameConverter nc = mock(NameConverter.class);
 
 		// Although UserInfo doesn't have public no-args constructor,
 		// DefaultResultEntityCreator can create UserInfo instance
-		UserInfo userInfo = operator.createEntity(UserInfo.class, rs, meta, 0,
-				beanDesc, dialect, getDefaultValueTypes(), nc);
+		UserInfo userInfo = operator.createEntity(UserInfo.class, rs, beanDesc, dialect, getDefaultValueTypes(), nc);
 
 		assertNotNull(userInfo);
 	}
@@ -61,14 +61,14 @@ public class DefaultEntityOperatorTest extends TestCase {
 	public void testDefaultEntityOperator3() throws SQLException {
 		ResultSet rs = mock(ResultSet.class);
 		ResultSetMetaData meta = mock(ResultSetMetaData.class);
+		when(rs.getMetaData()).thenReturn(meta);
 		BeanDesc beanDesc = mock(BeanDesc.class);
 		Dialect dialect = mock(Dialect.class);
 		NameConverter nc = mock(NameConverter.class);
 
 		// Although UserInfo doesn't have public no-args constructor,
 		// DefaultResultEntityCreator can create UserInfo instance
-		UserInfo3 userInfo = operator.createEntity(UserInfo3.class, rs, meta, 0,
-				beanDesc, dialect, getDefaultValueTypes(), nc);
+		UserInfo3 userInfo = operator.createEntity(UserInfo3.class, rs, beanDesc, dialect, getDefaultValueTypes(), nc);
 
 		assertNotNull(userInfo);
 	}

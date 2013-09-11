@@ -37,13 +37,15 @@ public class DefaultEntityOperator implements EntityOperator {
 	 * @param valueTypes the list of ValueTypes
 	 * @param nameConverter the NameConverter
 	 * @return the instance of entity class or Map
+	 * @throws SQLException 
 	 * @throws EntityCreationFailedException if {@link EntityOperator} failed to create a result entity
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> T createEntity(Class<T> entityType, ResultSet rs,
-			ResultSetMetaData meta, int columnCount, BeanDesc beanDesc,
-			Dialect dialect, List<ValueType<?>> valueTypes, NameConverter nameConverter) {
+	public <T> T createEntity(Class<T> entityType, ResultSet rs, BeanDesc beanDesc,
+			Dialect dialect, List<ValueType<?>> valueTypes, NameConverter nameConverter) throws SQLException {
 
+		ResultSetMetaData meta = rs.getMetaData();
+		int columnCount = meta.getColumnCount();
 		try {
 			{
 				ValueType<T> valueType = MirageUtil.getValueType(entityType, null, dialect, valueTypes);

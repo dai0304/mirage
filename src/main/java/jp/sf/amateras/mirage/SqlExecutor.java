@@ -122,14 +122,11 @@ public class SqlExecutor {
 			}
 
 			rs = stmt.executeQuery();
-			ResultSetMetaData meta = rs.getMetaData();
-			int columnCount = meta.getColumnCount();
 
 			BeanDesc beanDesc = BeanDescFactory.getBeanDesc(clazz);
 
 			while(rs.next()){
-				T entity = entityOreator.createEntity(clazz, rs, meta, columnCount, beanDesc,
-						dialect, valueTypes, nameConverter);
+				T entity = entityOreator.createEntity(clazz, rs, beanDesc, dialect, valueTypes, nameConverter);
 				list.add(entity);
 			}
 
@@ -166,15 +163,12 @@ public class SqlExecutor {
 			}
 
 			rs = stmt.executeQuery();
-			ResultSetMetaData meta = rs.getMetaData();
-			int columnCount = meta.getColumnCount();
 
 			BeanDesc beanDesc = BeanDescFactory.getBeanDesc(clazz);
 			R result = null;
 
 			while(rs.next()){
-				T entity = entityOreator.createEntity(clazz, rs, meta, columnCount, beanDesc,
-						dialect, valueTypes, nameConverter);
+				T entity = entityOreator.createEntity(clazz, rs, beanDesc, dialect, valueTypes, nameConverter);
 				try {
 					result = callback.iterate(entity);
 				} catch(BreakIterationException ex){
@@ -214,14 +208,11 @@ public class SqlExecutor {
 			}
 
 			rs = stmt.executeQuery();
-			ResultSetMetaData meta = rs.getMetaData();
-			int columnCount = meta.getColumnCount();
 
 			BeanDesc beanDesc = BeanDescFactory.getBeanDesc(clazz);
 
 			if(rs.next()){
-				T entity = entityOreator.createEntity(clazz, rs, meta, columnCount, beanDesc,
-						dialect, valueTypes, nameConverter);
+				T entity = entityOreator.createEntity(clazz, rs, beanDesc, dialect, valueTypes, nameConverter);
 				return entity;
 			}
 
